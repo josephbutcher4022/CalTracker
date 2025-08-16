@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CalTracker</string>
+    <string name="title_activity_thirty_day_list">ThirtyDayListActivity</string>
+</resources>
