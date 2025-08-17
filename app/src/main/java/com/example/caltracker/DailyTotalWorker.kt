@@ -16,15 +16,18 @@ class DailyTotalWorker(appContext: Context, params: WorkerParameters) : Coroutin
         return withContext(Dispatchers.IO) {
             try {
                 val repository = MealRepository(applicationContext as Application)
-                val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val today = dateFormat.format(Date())
                 val meals = repository.getMealsForToday().firstOrNull() ?: emptyList()
                 val totalCalories = meals.sumOf { it.calories }
                 val totalProtein = meals.sumOf { it.protein }
-                repository.insertDailyTotal(DailyTotalEntity(
-                    date = today,
-                    totalCalories = totalCalories,
-                    totalProtein = totalProtein
-                ))
+                repository.insertDailyTotal(
+                    DailyTotalEntity(
+                        date = today,
+                        totalCalories = totalCalories,
+                        totalProtein = totalProtein
+                    )
+                )
                 repository.deleteOldTotals()
                 println("DailyTotalWorker: Ran for $today, Calories: $totalCalories, Protein: $totalProtein")
                 Result.success()

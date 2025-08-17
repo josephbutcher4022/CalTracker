@@ -36,8 +36,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val initializer = DatabaseInitializer(this)
-        initializer.initialize()
         println("MainActivity: Started")
 
         // Schedule daily total aggregation at 11:59 PM

@@ -15,6 +15,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DailyTotalsActivity : AppCompatActivity() {
 
@@ -48,11 +51,30 @@ class DailyTotalsActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // Load all daily totals
+        // Load all daily totals and current day's meals
         lifecycleScope.launch {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val today = dateFormat.format(Date())
             repository.getAllDailyTotals().collectLatest { totals ->
-                adapter.updateTotals(totals)
-                println("DailyTotalsActivity: Loaded ${totals.size} daily totals")
+                // Calculate current day's total from meals
+                repository.getMealsByDate(today).collectLatest { meals ->
+                    val todayTotalCalories = meals.sumOf { it.calories }
+                    val todayTotalProtein = meals.sumOf { it.protein }
+                    val todayTotal = DailyTotalEntity(
+                        id = 0, // Temporary ID, not saved yet
+                        date = today,
+                        totalCalories = todayTotalCalories,
+                        totalProtein = todayTotalProtein
+                    )
+                    // Combine today's total with saved totals
+                    val updatedTotals = if (totals.any { it.date == today }) {
+                        totals // If today is already saved, use existing totals
+                    } else {
+                        listOf(todayTotal) + totals.filter { it.date != today }
+                    }
+                    adapter.updateTotals(updatedTotals.sortedByDescending { it.date })
+                    println("DailyTotalsActivity: Loaded ${updatedTotals.size} daily totals, including today: $todayTotalCalories cal, $todayTotalProtein g protein")
+                }
             }
         }
 
