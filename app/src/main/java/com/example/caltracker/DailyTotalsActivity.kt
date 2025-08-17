@@ -100,8 +100,10 @@ class DailyTotalsActivity : AppCompatActivity() {
                     meals.forEach { meal ->
                         repository.deleteMeal(meal)
                     }
-                    // Delete the daily total
-                    repository.deleteDailyTotal(total)
+                    // Delete the daily total if it exists in the database
+                    if (total.id != 0) { // Only delete if it's a saved entry
+                        repository.deleteDailyTotal(total)
+                    }
                     runOnUiThread {
                         selectedDailyTotal = null
                         adapter.clearSelection()
@@ -111,6 +113,8 @@ class DailyTotalsActivity : AppCompatActivity() {
                     }
                 }
             }
+            // Consume the click event to prevent propagation
+            true
         }
 
         // Back button
