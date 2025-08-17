@@ -13,6 +13,7 @@ class MealRepository(application: Application) {
     private val db: AppDatabase = AppDatabase.getDatabase(application)
     private val mealDao: MealDao = db.mealDao()
     private val dailyTotalDao: DailyTotalDao = db.dailyTotalDao()
+    private val foodDao: FoodDao = db.foodDao()
 
     fun getMealsForToday(): Flow<List<MealEntity>> {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -62,5 +63,23 @@ class MealRepository(application: Application) {
         val cutoffDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
         dailyTotalDao.deleteTotalsOlderThan(cutoffDate)
         println("MealRepository: Deleted daily totals older than $cutoffDate")
+    }
+
+    suspend fun insertFood(food: FoodEntity) {
+        foodDao.insertFood(food)
+        println("MealRepository: Food inserted successfully: $food")
+    }
+
+    suspend fun getFoodByName(name: String): FoodEntity? {
+        return foodDao.getFoodByName(name)
+    }
+
+    fun getAllFoods(): Flow<List<FoodEntity>> {
+        return foodDao.getAllFoods()
+    }
+
+    suspend fun deleteFood(food: FoodEntity) {
+        foodDao.deleteFood(food)
+        println("MealRepository: Food deleted successfully: $food")
     }
 }

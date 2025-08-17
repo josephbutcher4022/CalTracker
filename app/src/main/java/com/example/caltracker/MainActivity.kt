@@ -58,26 +58,23 @@ class MainActivity : AppCompatActivity() {
         val btnDelete: Button = findViewById(R.id.btn_delete)
         val btnDailyTotals: Button = findViewById(R.id.btn_daily_totals)
         val btnCalculator: Button = findViewById(R.id.btn_calculator)
-        val rvTodayMeals: RecyclerView = findViewById(R.id.rv_today_meals)
+        val rvMeals: RecyclerView = findViewById(R.id.rv_today_meals)
 
-        println("MainActivity: Button bindings - btnSave=${btnSave.text}, btnDelete=${btnDelete.text}, btnDailyTotals=${btnDailyTotals.text}, btnCalculator=${btnCalculator.text}")
+        // Initialize Spinner with meal types
+        val mealTypes = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mealTypes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerMealType.adapter = adapter
+        println("MainActivity: Spinner initialized with meal types")
 
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.meal_types,
-            R.layout.spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(R.layout.spinner_item)
-            spinnerMealType.adapter = adapter
-        }
-
-        rvTodayMeals.layoutManager = LinearLayoutManager(this)
+        // Initialize RecyclerView
         mealAdapter = MealAdapter(emptyList()) { meal ->
             selectedMeal = meal
             btnDelete.isEnabled = true
             println("MainActivity: Selected meal for deletion: $meal")
         }
-        rvTodayMeals.adapter = mealAdapter
+        rvMeals.layoutManager = LinearLayoutManager(this)
+        rvMeals.adapter = mealAdapter
         println("MainActivity: RecyclerView initialized with LinearLayoutManager")
 
         // Clear selection when tapping outside RecyclerView
@@ -90,32 +87,32 @@ class MainActivity : AppCompatActivity() {
                     println("MainActivity: Cleared meal selection on background tap")
                 }
             }
-            false // Allow other touch events to proceed
+            false
         }
 
         // Clear selection when tapping empty space in RecyclerView
         val gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapUp(e: MotionEvent): Boolean {
-                val view = rvTodayMeals.findChildViewUnder(e.x, e.y)
+                val view = rvMeals.findChildViewUnder(e.x, e.y)
                 if (view == null && selectedMeal != null) {
                     selectedMeal = null
                     mealAdapter.clearSelection()
                     btnDelete.isEnabled = false
                     println("MainActivity: Cleared meal selection on empty RecyclerView tap")
                 }
-                return false // Allow item clicks to proceed
+                return false
             }
         })
-        rvTodayMeals.setOnTouchListener { _, event ->
+        rvMeals.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
-            false // Allow RecyclerView item clicks
+            false
         }
 
+        // Collect meals for today
         lifecycleScope.launchWhenStarted {
             viewModel.todayMeals.collectLatest { meals ->
-                println("MainActivity: Collected todayMeals update with ${meals.size} entries")
                 mealAdapter.updateMeals(meals)
-                println("MainActivity: Notified adapter for update")
+                println("MainActivity: Collected todayMeals update with ${meals.size} entries")
             }
         }
 
@@ -144,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                 println("MainActivity: Deleting meal: $meal")
                 viewModel.deleteMeal(meal)
                 selectedMeal = null
-                mealAdapter.clearSelection() // Clear highlight
+                mealAdapter.clearSelection()
                 btnDelete.isEnabled = false
             }
         }
@@ -158,6 +155,8 @@ class MainActivity : AppCompatActivity() {
             println("MainActivity: Navigating to CalculatorActivity")
             startActivity(Intent(this, CalculatorActivity::class.java))
         }
+
+        println("MainActivity: Button bindings - btnSave=Log Meal, btnDelete=Delete, btnDailyTotals=Daily Totals, btnCalculator=Calculate")
     }
 
     private fun calculateInitialDelay(): Long {
