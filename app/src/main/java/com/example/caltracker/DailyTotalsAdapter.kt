@@ -8,50 +8,45 @@ import androidx.recyclerview.widget.RecyclerView
 
 class DailyTotalsAdapter(
     private var totals: List<DailyTotalEntity>,
-    private val onTotalClick: (DailyTotalEntity) -> Unit
+    private val onSelect: (DailyTotalEntity?) -> Unit
 ) : RecyclerView.Adapter<DailyTotalsAdapter.TotalViewHolder>() {
 
-    private var selectedPosition: Int = -1 // Track selected item position
+    private var selectedPosition: Int = -1
 
-    inner class TotalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class TotalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvDate: TextView = itemView.findViewById(R.id.tv_date)
-        val tvTotalCalories: TextView = itemView.findViewById(R.id.tv_total_calories)
-        val tvTotalProtein: TextView = itemView.findViewById(R.id.tv_total_protein)
-
-        fun bind(total: DailyTotalEntity, isSelected: Boolean) {
-            tvDate.text = total.date
-            tvTotalCalories.text = "Calories: ${total.totalCalories}"
-            tvTotalProtein.text = "Protein: ${total.totalProtein}g"
-            // Highlight selected item
-            itemView.setBackgroundColor(
-                if (isSelected) 0xFF555555.toInt() else 0xFF333333.toInt()
-            )
-            println("DailyTotalsAdapter: Binding total at position $adapterPosition: $total, Selected: $isSelected")
-            itemView.setOnClickListener {
-                val previousPosition = selectedPosition
-                selectedPosition = adapterPosition
-                onTotalClick(total)
-                // Notify changes to update highlighting
-                notifyItemChanged(previousPosition)
-                notifyItemChanged(selectedPosition)
-            }
-        }
+        val tvTotals: TextView = itemView.findViewById(R.id.tv_totals)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TotalViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.daily_total_item, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.daily_total_item, parent, false)
         return TotalViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: TotalViewHolder, position: Int) {
-        holder.bind(totals[position], position == selectedPosition)
+        val total = totals[position]
+        holder.tvDate.text = total.date
+        holder.tvTotals.text = "${total.totalCalories} cal, ${total.totalProtein}g protein"
+        // Apply highlight for selected item
+        holder.itemView.isSelected = position == selectedPosition
+        holder.itemView.setBackgroundColor(
+            if (position == selectedPosition) 0xFF555555.toInt() else 0xFF333333.toInt()
+        )
+        holder.itemView.setOnClickListener {
+            val previousPosition = selectedPosition
+            selectedPosition = if (selectedPosition == position) -1 else position
+            notifyItemChanged(previousPosition)
+            notifyItemChanged(selectedPosition)
+            onSelect(if (selectedPosition != -1) totals[selectedPosition] else null)
+        }
     }
 
     override fun getItemCount(): Int = totals.size
 
     fun updateTotals(newTotals: List<DailyTotalEntity>) {
         totals = newTotals
-        selectedPosition = -1 // Reset selection when totals change
+        selectedPosition = -1 // Reset selection
         notifyDataSetChanged()
     }
 

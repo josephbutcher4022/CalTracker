@@ -14,14 +14,7 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/tv_total_calories"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tv_total_protein"
+        android:id="@+id/tv_totals"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"

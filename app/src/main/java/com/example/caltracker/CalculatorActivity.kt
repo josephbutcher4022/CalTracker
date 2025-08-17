@@ -116,7 +116,7 @@ class CalculatorActivity : AppCompatActivity() {
             val calPer100g = etCalPer100g.text.toString().toIntOrNull() ?: 0
             if (name.isNotEmpty() && calPer100g > 0) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    repository.insertFood(FoodEntity(name, calPer100g))
+                    repository.insertFood(FoodEntity(id = 0, name = name, caloriesPer100g = calPer100g))
                     runOnUiThread {
                         etFoodName.text.clear()
                         etCalPer100g.text.clear()

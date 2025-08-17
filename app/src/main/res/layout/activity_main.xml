@@ -42,6 +42,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp">
+
         <EditText
             android:id="@+id/et_calories"
             android:layout_width="0dp"
@@ -51,6 +52,7 @@
             android:inputType="number"
             android:textColor="#FFFFFF"
             android:textColorHint="#FFFFFF" />
+
         <EditText
             android:id="@+id/et_protein"
             android:layout_width="0dp"
@@ -60,6 +62,7 @@
             android:inputType="number"
             android:textColor="#FFFFFF"
             android:textColorHint="#FFFFFF" />
+
     </LinearLayout>
 
     <!-- Log Meal and Delete buttons -->
@@ -68,6 +71,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp">
+
         <Button
             android:id="@+id/btn_save"
             android:layout_width="0dp"
@@ -80,6 +84,7 @@
             android:text="Log Meal"
             style="@style/Widget.App.Button"
             android:layout_marginEnd="8dp" />
+
         <Button
             android:id="@+id/btn_delete"
             android:layout_width="0dp"
@@ -92,30 +97,53 @@
             android:text="Delete"
             android:enabled="false"
             style="@style/Widget.App.Button" />
+
     </LinearLayout>
 
-    <!-- Today's Meals section -->
+    <!-- Today's Meals section with title and date -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
         android:padding="16dp">
-        <TextView
-            android:id="@+id/tv_today_meals_title"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_margin="16dp"
-            android:text="Today's Meals"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_today_meals_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="16dp"
+                android:text="Today's Meals"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/tv_current_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text=""
+                android:textSize="16sp"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_today_meals"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="#333333" />
+
     </LinearLayout>
 
     <!-- Daily Totals and Calculate buttons -->
@@ -126,6 +154,7 @@
         android:layout_marginTop="16dp"
         android:layout_margin="16dp"
         android:padding="16dp">
+
         <Button
             android:id="@+id/btn_daily_totals"
             android:layout_width="0dp"
@@ -138,6 +167,7 @@
             android:text="Daily Totals"
             style="@style/Widget.App.Button"
             android:layout_marginEnd="8dp" />
+
         <Button
             android:id="@+id/btn_calculator"
             android:layout_width="0dp"
@@ -149,5 +179,7 @@
             android:maxLines="1"
             android:text="Calculate"
             style="@style/Widget.App.Button" />
+
     </LinearLayout>
+
 </LinearLayout>

@@ -3,83 +3,32 @@ package com.example.caltracker
 import android.app.Application
 import androidx.room.Room
 import kotlinx.coroutines.flow.Flow
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 class MealRepository(application: Application) {
+    private val database: AppDatabase = Room.databaseBuilder(
+        application,
+        AppDatabase::class.java, "caltracker-database"
+    ).build()
+    private val foodDao = database.foodDao()
+    private val mealDao = database.mealDao()
+    private val dailyTotalDao = database.dailyTotalDao()
 
-    private val db: AppDatabase = AppDatabase.getDatabase(application)
-    private val mealDao: MealDao = db.mealDao()
-    private val dailyTotalDao: DailyTotalDao = db.dailyTotalDao()
-    private val foodDao: FoodDao = db.foodDao()
-
+    fun getAllFoods(): Flow<List<FoodEntity>> = foodDao.getAllFoods()
+    suspend fun getFoodByName(name: String): FoodEntity? = foodDao.getFoodByName(name)
+    suspend fun insertFood(food: FoodEntity) = foodDao.insertFood(food)
+    suspend fun deleteFood(food: FoodEntity) = foodDao.deleteFood(food)
+    fun getMealsByDate(date: String): Flow<List<MealEntity>> = mealDao.getMealsByDate(date)
+    suspend fun insertMeal(meal: MealEntity) = mealDao.insertMeal(meal)
+    suspend fun deleteMeal(meal: MealEntity) = mealDao.deleteMeal(meal)
     fun getMealsForToday(): Flow<List<MealEntity>> {
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        println("MealRepository: Fetching meals for today: $today")
-        return mealDao.getMealsForDate(today)
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        return mealDao.getMealsForToday(today)
     }
-
-    fun getAllMeals(): Flow<List<MealEntity>> {
-        return mealDao.getAllMeals()
-    }
-
-    fun getAllDailyTotals(): Flow<List<DailyTotalEntity>> {
-        return dailyTotalDao.getAllDailyTotals()
-    }
-
-    suspend fun insertMeal(meal: MealEntity) {
-        mealDao.insertMeal(meal)
-        println("MealRepository: Meal inserted successfully: $meal")
-    }
-
-    suspend fun deleteMeal(meal: MealEntity) {
-        mealDao.deleteMeal(meal)
-        println("MealRepository: Meal deleted successfully: $meal")
-    }
-
-    suspend fun deleteDailyTotal(dailyTotal: DailyTotalEntity) {
-        dailyTotalDao.deleteDailyTotal(dailyTotal)
-        println("MealRepository: Daily total deleted successfully: $dailyTotal")
-    }
-
-    suspend fun deleteOldMeals() {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -30)
-        val cutoffDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
-        mealDao.deleteMealsOlderThan(cutoffDate)
-        println("MealRepository: Deleted meals older than $cutoffDate")
-    }
-
-    suspend fun insertDailyTotal(total: DailyTotalEntity) {
-        dailyTotalDao.insertDailyTotal(total)
-        println("MealRepository: Daily total inserted successfully: $total")
-    }
-
+    fun getAllDailyTotals(): Flow<List<DailyTotalEntity>> = dailyTotalDao.getAllDailyTotals()
+    suspend fun insertDailyTotal(dailyTotal: DailyTotalEntity) = dailyTotalDao.insertDailyTotal(dailyTotal)
+    suspend fun deleteDailyTotal(dailyTotal: DailyTotalEntity) = dailyTotalDao.deleteDailyTotal(dailyTotal)
     suspend fun deleteOldTotals() {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -30)
-        val cutoffDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
-        dailyTotalDao.deleteTotalsOlderThan(cutoffDate)
-        println("MealRepository: Deleted daily totals older than $cutoffDate")
-    }
-
-    suspend fun insertFood(food: FoodEntity) {
-        foodDao.insertFood(food)
-        println("MealRepository: Food inserted successfully: $food")
-    }
-
-    suspend fun getFoodByName(name: String): FoodEntity? {
-        return foodDao.getFoodByName(name)
-    }
-
-    fun getAllFoods(): Flow<List<FoodEntity>> {
-        return foodDao.getAllFoods()
-    }
-
-    suspend fun deleteFood(food: FoodEntity) {
-        foodDao.deleteFood(food)
-        println("MealRepository: Food deleted successfully: $food")
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        dailyTotalDao.deleteOldTotals(today)
     }
 }

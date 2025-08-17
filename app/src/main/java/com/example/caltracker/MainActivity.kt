@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val initializer = DatabaseInitializer(this)
+        initializer.initialize()
         println("MainActivity: Started")
 
         // Schedule daily total aggregation at 11:59 PM
@@ -58,26 +61,36 @@ class MainActivity : AppCompatActivity() {
         val btnDelete: Button = findViewById(R.id.btn_delete)
         val btnDailyTotals: Button = findViewById(R.id.btn_daily_totals)
         val btnCalculator: Button = findViewById(R.id.btn_calculator)
-        val rvMeals: RecyclerView = findViewById(R.id.rv_today_meals)
+        val rvTodayMeals: RecyclerView = findViewById(R.id.rv_today_meals)
+        val tvCurrentDate: TextView = findViewById(R.id.tv_current_date)
 
-        // Initialize Spinner with meal types
-        val mealTypes = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mealTypes)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerMealType.adapter = adapter
-        println("MainActivity: Spinner initialized with meal types")
+        // Set current date
+        tvCurrentDate.text = SimpleDateFormat("M-d-yyyy", Locale.getDefault()).format(Date())
 
-        // Initialize RecyclerView
+        println("MainActivity: Button bindings - btnSave=${btnSave.text}, btnDelete=${btnDelete.text}, btnDailyTotals=${btnDailyTotals.text}, btnCalculator=${btnCalculator.text}")
+
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.meal_types,
+            R.layout.spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(R.layout.spinner_item)
+            spinnerMealType.adapter = adapter
+        }
+
+        rvTodayMeals.layoutManager = LinearLayoutManager(this).apply {
+            reverseLayout = true
+            stackFromEnd = true
+        }
         mealAdapter = MealAdapter(emptyList()) { meal ->
             selectedMeal = meal
-            btnDelete.isEnabled = true
-            println("MainActivity: Selected meal for deletion: $meal")
+            btnDelete.isEnabled = meal != null
+            println("MainActivity: Selected meal for deletion: ${meal?.description ?: "none"}")
         }
-        rvMeals.layoutManager = LinearLayoutManager(this)
-        rvMeals.adapter = mealAdapter
+        rvTodayMeals.adapter = mealAdapter
         println("MainActivity: RecyclerView initialized with LinearLayoutManager")
 
-        // Clear selection when tapping outside RecyclerView
+        // Clear selection when tapping anywhere outside a meal item
         rootLayout.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 selectedMeal?.let {
@@ -87,32 +100,33 @@ class MainActivity : AppCompatActivity() {
                     println("MainActivity: Cleared meal selection on background tap")
                 }
             }
-            false
+            false // Allow other touch events to proceed
         }
 
-        // Clear selection when tapping empty space in RecyclerView
+        // Clear selection when tapping empty space or same item in RecyclerView
         val gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
             override fun onSingleTapUp(e: MotionEvent): Boolean {
-                val view = rvMeals.findChildViewUnder(e.x, e.y)
+                val view = rvTodayMeals.findChildViewUnder(e.x, e.y)
                 if (view == null && selectedMeal != null) {
                     selectedMeal = null
                     mealAdapter.clearSelection()
                     btnDelete.isEnabled = false
                     println("MainActivity: Cleared meal selection on empty RecyclerView tap")
                 }
-                return false
+                return false // Allow item clicks to proceed
             }
         })
-        rvMeals.setOnTouchListener { _, event ->
+
+        rvTodayMeals.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
-            false
+            false // Allow RecyclerView item clicks
         }
 
-        // Collect meals for today
         lifecycleScope.launchWhenStarted {
             viewModel.todayMeals.collectLatest { meals ->
-                mealAdapter.updateMeals(meals)
                 println("MainActivity: Collected todayMeals update with ${meals.size} entries")
+                mealAdapter.updateMeals(meals.sortedBy { it.id })
+                println("MainActivity: Notified adapter for update")
             }
         }
 
@@ -126,10 +140,8 @@ class MainActivity : AppCompatActivity() {
             val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
             val today = dateFormat.format(Date())
             val time = timeFormat.format(Date())
-
             println("MainActivity: Saving meal: $mealType, Description: $description, Calories: $calories, Protein: $protein, Date: $today, Time: $time")
             viewModel.saveMeal(today, time, mealType, description, calories, protein)
-
             etDescription.text.clear()
             etCalories.text.clear()
             etProtein.text.clear()
@@ -155,8 +167,6 @@ class MainActivity : AppCompatActivity() {
             println("MainActivity: Navigating to CalculatorActivity")
             startActivity(Intent(this, CalculatorActivity::class.java))
         }
-
-        println("MainActivity: Button bindings - btnSave=Log Meal, btnDelete=Delete, btnDailyTotals=Daily Totals, btnCalculator=Calculate")
     }
 
     private fun calculateInitialDelay(): Long {
