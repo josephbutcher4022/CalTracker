@@ -4,7 +4,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="2dp"
     android:background="#333333">
 
     <!-- Vertical LinearLayout for input fields and other elements -->
@@ -51,13 +51,12 @@
 
         <Button
             android:id="@+id/btn_add_food"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
             android:minHeight="48dp"
             android:maxLines="1"
             android:gravity="center"
-            android:layout_gravity="center_horizontal"
             android:text="Add"
             style="@style/Widget.App.Button"/>
 
@@ -74,7 +73,7 @@
             android:id="@+id/et_grams"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Grams eaten (e.g., 350)"
+            android:hint="Grams (e.g., 100)"
             android:inputType="number"
             android:textColor="#FFFFFF"
             android:textColorHint="#AAAAAA"
@@ -90,28 +89,39 @@
 
         <Button
             android:id="@+id/btn_calculate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
             android:minHeight="48dp"
             android:maxLines="1"
             android:gravity="center"
-            android:layout_gravity="center_horizontal"
             android:text="Calculate"
             style="@style/Widget.App.Button"/>
 
-        <TextView
-            android:id="@+id/tv_result"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total calories: "
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="16dp"/>
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:id="@+id/tv_result_static"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Calories: "
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"/>
+            <TextView
+                android:id="@+id/tv_result_dynamic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"/>
+        </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Temporary message TextView -->
+    <!-- Temporary message TextView (unused but kept in layout) -->
     <TextView
         android:id="@+id/tv_message"
         android:layout_width="wrap_content"
@@ -132,7 +142,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp"
         android:layout_margin="16dp"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
