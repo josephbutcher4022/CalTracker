@@ -69,9 +69,6 @@ interface DailyTotalDao {
 
     @Delete
     suspend fun deleteDailyTotal(dailyTotal: DailyTotalEntity)
-
-    @Query("DELETE FROM daily_totals WHERE date < :date")
-    suspend fun deleteOldTotals(date: String)
 }
 
 @Database(entities = [FoodEntity::class, MealEntity::class, DailyTotalEntity::class], version = 1, exportSchema = false)

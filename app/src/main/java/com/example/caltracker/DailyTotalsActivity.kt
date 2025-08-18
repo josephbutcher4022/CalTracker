@@ -55,24 +55,23 @@ class DailyTotalsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val today = dateFormat.format(Date())
-            repository.getAllDailyTotals().collectLatest { totals ->
-                // Calculate current day's total from meals
-                repository.getMealsByDate(today).collectLatest { meals ->
-                    val todayTotalCalories = meals.sumOf { it.calories }
-                    val todayTotalProtein = meals.sumOf { it.protein }
-                    val todayTotal = DailyTotalEntity(
-                        id = 0, // Temporary ID, not saved yet
-                        date = today,
-                        totalCalories = todayTotalCalories,
-                        totalProtein = todayTotalProtein
-                    )
+            repository.getMealsByDate(today).collectLatest { meals ->
+                val todayTotalCalories = meals.sumOf { it.calories }
+                val todayTotalProtein = meals.sumOf { it.protein }
+                val todayTotal = DailyTotalEntity(
+                    id = 0, // Temporary ID, not saved yet
+                    date = today,
+                    totalCalories = todayTotalCalories,
+                    totalProtein = todayTotalProtein
+                )
+                repository.getAllDailyTotals().collectLatest { totals ->
                     // Combine today's total with saved totals
-                    val updatedTotals = if (totals.any { it.date == today }) {
-                        totals // If today is already saved, use existing totals
+                    val updatedTotals = if (meals.isNotEmpty()) {
+                        (listOf(todayTotal) + totals.filter { it.date != today }).sortedByDescending { it.date }
                     } else {
-                        listOf(todayTotal) + totals.filter { it.date != today }
+                        totals.sortedByDescending { it.date }
                     }
-                    adapter.updateTotals(updatedTotals.sortedByDescending { it.date })
+                    adapter.updateTotals(updatedTotals)
                     println("DailyTotalsActivity: Loaded ${updatedTotals.size} daily totals, including today: $todayTotalCalories cal, $todayTotalProtein g protein")
                 }
             }

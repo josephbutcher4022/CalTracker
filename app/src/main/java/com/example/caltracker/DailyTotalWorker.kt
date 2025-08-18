@@ -21,15 +21,25 @@ class DailyTotalWorker(appContext: Context, params: WorkerParameters) : Coroutin
                 val meals = repository.getMealsForToday().firstOrNull() ?: emptyList()
                 val totalCalories = meals.sumOf { it.calories }
                 val totalProtein = meals.sumOf { it.protein }
-                repository.insertDailyTotal(
-                    DailyTotalEntity(
-                        date = today,
-                        totalCalories = totalCalories,
-                        totalProtein = totalProtein
-                    )
-                )
-                repository.deleteOldTotals()
-                println("DailyTotalWorker: Ran for $today, Calories: $totalCalories, Protein: $totalProtein")
+                // Only insert if there are meals to avoid empty entries
+                if (meals.isNotEmpty()) {
+                    // Check if a total already exists for today to avoid duplicates
+                    val existingTotal = repository.getAllDailyTotals().firstOrNull()?.find { it.date == today }
+                    if (existingTotal == null) {
+                        repository.insertDailyTotal(
+                            DailyTotalEntity(
+                                date = today,
+                                totalCalories = totalCalories,
+                                totalProtein = totalProtein
+                            )
+                        )
+                        println("DailyTotalWorker: Saved total for $today, Calories: $totalCalories, Protein: $totalProtein")
+                    } else {
+                        println("DailyTotalWorker: Total for $today already exists, skipping")
+                    }
+                } else {
+                    println("DailyTotalWorker: No meals for $today, no total saved")
+                }
                 Result.success()
             } catch (e: Exception) {
                 println("DailyTotalWorker: Error - ${e.message}")

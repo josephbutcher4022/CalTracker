@@ -27,8 +27,4 @@ class MealRepository(application: Application) {
     fun getAllDailyTotals(): Flow<List<DailyTotalEntity>> = dailyTotalDao.getAllDailyTotals()
     suspend fun insertDailyTotal(dailyTotal: DailyTotalEntity) = dailyTotalDao.insertDailyTotal(dailyTotal)
     suspend fun deleteDailyTotal(dailyTotal: DailyTotalEntity) = dailyTotalDao.deleteDailyTotal(dailyTotal)
-    suspend fun deleteOldTotals() {
-        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-        dailyTotalDao.deleteOldTotals(today)
-    }
 }
