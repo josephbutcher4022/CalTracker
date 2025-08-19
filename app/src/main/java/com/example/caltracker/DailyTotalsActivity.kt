@@ -15,9 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class DailyTotalsActivity : AppCompatActivity() {
 
@@ -51,29 +48,11 @@ class DailyTotalsActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // Load all daily totals and current day's meals
+        // Load all daily totals
         lifecycleScope.launch {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val today = dateFormat.format(Date())
-            repository.getMealsByDate(today).collectLatest { meals ->
-                val todayTotalCalories = meals.sumOf { it.calories }
-                val todayTotalProtein = meals.sumOf { it.protein }
-                val todayTotal = DailyTotalEntity(
-                    id = 0, // Temporary ID, not saved yet
-                    date = today,
-                    totalCalories = todayTotalCalories,
-                    totalProtein = todayTotalProtein
-                )
-                repository.getAllDailyTotals().collectLatest { totals ->
-                    // Combine today's total with saved totals
-                    val updatedTotals = if (meals.isNotEmpty()) {
-                        (listOf(todayTotal) + totals.filter { it.date != today }).sortedByDescending { it.date }
-                    } else {
-                        totals.sortedByDescending { it.date }
-                    }
-                    adapter.updateTotals(updatedTotals)
-                    println("DailyTotalsActivity: Loaded ${updatedTotals.size} daily totals, including today: $todayTotalCalories cal, $todayTotalProtein g protein")
-                }
+            repository.getAllDailyTotals().collectLatest { totals ->
+                adapter.updateTotals(totals)
+                println("DailyTotalsActivity: Loaded ${totals.size} daily totals")
             }
         }
 
@@ -96,13 +75,11 @@ class DailyTotalsActivity : AppCompatActivity() {
                 lifecycleScope.launch(Dispatchers.IO) {
                     // Delete all meals for the selected date
                     val meals = repository.getMealsByDate(total.date).firstOrNull() ?: emptyList()
-                    meals.forEach { meal ->
+                    for (meal in meals) {
                         repository.deleteMeal(meal)
                     }
-                    // Delete the daily total if it exists in the database
-                    if (total.id != 0) { // Only delete if it's a saved entry
-                        repository.deleteDailyTotal(total)
-                    }
+                    // Delete the daily total
+                    repository.deleteDailyTotal(total)
                     runOnUiThread {
                         selectedDailyTotal = null
                         adapter.clearSelection()
@@ -112,8 +89,6 @@ class DailyTotalsActivity : AppCompatActivity() {
                     }
                 }
             }
-            // Consume the click event to prevent propagation
-            true
         }
 
         // Back button

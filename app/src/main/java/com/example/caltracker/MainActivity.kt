@@ -143,7 +143,6 @@ class MainActivity : AppCompatActivity() {
             etDescription.text.clear()
             etCalories.text.clear()
             etProtein.text.clear()
-            spinnerMealType.setSelection(0)
         }
 
         btnDelete.setOnClickListener {
