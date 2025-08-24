@@ -1,30 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.CalTracker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color -->
-        <item name="colorPrimary">#333333</item>
-        <item name="colorPrimaryVariant">#333333</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <!-- Secondary brand color -->
-        <item name="colorSecondary">#555555</item>
-        <item name="colorSecondaryVariant">#555555</item>
-        <item name="colorOnSecondary">@android:color/white</item>
-        <!-- Status bar color -->
-        <item name="android:statusBarColor">#333333</item>
-        <!-- Background color -->
-        <item name="android:windowBackground">#333333</item>
-        <!-- Text color -->
-        <item name="android:textColor">@android:color/white</item>
-        <!-- Button text color -->
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <!-- Button style -->
-        <item name="buttonStyle">@style/Widget.App.Button</item>
-    </style>
-
-    <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button">
-        <item name="android:background">#555555</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="backgroundTint">#555555</item>
-        <item name="android:backgroundTintMode">src_in</item>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.CalTracker" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/very_dark_gray</item>
+        <item name="colorPrimaryVariant">@color/very_dark_gray</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/medium_dark_gray</item>
+        <item name="colorSecondaryVariant">@color/medium_dark_gray</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/very_dark_gray</item>
+        <item name="android:windowBackground">@color/dark_gray_background</item>
     </style>
 </resources>

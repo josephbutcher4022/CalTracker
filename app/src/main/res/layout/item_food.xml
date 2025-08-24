@@ -4,8 +4,8 @@
 
     <data>
         <variable
-            name="dailyTotal"
-            type="com.example.caltracker.DailyTotalEntity" />
+            name="food"
+            type="com.example.caltracker.FoodEntity" />
     </data>
 
     <LinearLayout
@@ -17,28 +17,19 @@
         android:layout_marginBottom="8dp">
 
         <TextView
-            android:id="@+id/tv_date"
+            android:id="@+id/tv_food_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{dailyTotal.date}"
+            android:text="@{food.name}"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:paddingBottom="4dp" />
 
         <TextView
-            android:id="@+id/tv_total_calories"
+            android:id="@+id/tv_calories_per_100g"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{`Total Calories: ` + dailyTotal.totalCalories}"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:paddingBottom="4dp" />
-
-        <TextView
-            android:id="@+id/tv_total_protein"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{`Total Protein: ` + dailyTotal.totalProtein}"
+            android:text="@{`Calories per 100g: ` + food.caloriesPer100g}"
             android:textColor="@color/white"
             android:textSize="14sp" />
 

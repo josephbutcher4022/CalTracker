@@ -1,179 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="2dp"
-    android:background="#333333">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Vertical LinearLayout for input fields and other elements -->
-    <LinearLayout
-        android:id="@+id/input_layout"
+    <data>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
+        android:layout_height="match_parent"
         android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tv_message"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Section to add a new food -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Food Calorie Info"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="8dp"/>
+        android:background="@color/dark_gray_background"
+        tools:context=".CalculatorActivity">
 
         <EditText
             android:id="@+id/et_food_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Food name (e.g., Potato)"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#AAAAAA"
-            android:backgroundTint="#555555"
-            android:layout_marginBottom="8dp"/>
+            android:hint="Food Name"
+            android:background="@null"
+            android:backgroundTint="@color/medium_gray"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/medium_gray"
+            android:layout_marginTop="-4dp"
+            app:layout_constraintTop_toBottomOf="@id/et_food_name"
+            app:layout_constraintStart_toStartOf="@id/et_food_name"
+            app:layout_constraintEnd_toEndOf="@id/et_food_name" />
 
         <EditText
-            android:id="@+id/et_cal_per_100g"
+            android:id="@+id/et_calories_per_100g"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Calories per 100g (e.g., 77)"
+            android:hint="Calories per 100g"
             android:inputType="number"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#AAAAAA"
-            android:backgroundTint="#555555"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:id="@+id/btn_add_food"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:background="@null"
+            android:backgroundTint="@color/medium_gray"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:padding="12dp"
             android:layout_marginBottom="16dp"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:gravity="center"
-            android:text="Add"
-            style="@style/Widget.App.Button"/>
+            app:layout_constraintTop_toBottomOf="@id/et_food_name" />
 
-        <!-- Section to calculate calories -->
-        <TextView
-            android:layout_width="wrap_content"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/medium_gray"
+            android:layout_marginTop="-4dp"
+            app:layout_constraintTop_toBottomOf="@id/et_calories_per_100g"
+            app:layout_constraintStart_toStartOf="@id/et_calories_per_100g"
+            app:layout_constraintEnd_toEndOf="@id/et_calories_per_100g" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_foods"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/medium_dark_gray"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/et_calories_per_100g"
+            app:layout_constraintBottom_toTopOf="@id/spinner_food" />
+
+        <Spinner
+            android:id="@+id/spinner_food"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Calculate Calories"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="8dp"/>
+            android:background="@color/medium_dark_gray"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/rv_foods" />
 
         <EditText
             android:id="@+id/et_grams"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Grams (e.g., 100)"
+            android:hint="Grams"
             android:inputType="number"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#AAAAAA"
-            android:backgroundTint="#555555"
-            android:layout_marginBottom="8dp"/>
+            android:background="@null"
+            android:backgroundTint="@color/medium_gray"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/spinner_food" />
 
-        <Spinner
-            android:id="@+id/spinner_food_name"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/medium_gray"
+            android:layout_marginTop="-4dp"
+            app:layout_constraintTop_toBottomOf="@id/et_grams"
+            app:layout_constraintStart_toStartOf="@id/et_grams"
+            app:layout_constraintEnd_toEndOf="@id/et_grams" />
+
+        <TextView
+            android:id="@+id/tv_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#555555"
-            android:layout_marginBottom="8dp"/>
+            android:background="@color/medium_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/et_grams"
+            app:layout_constraintBottom_toTopOf="@id/btn_add_food" />
+
+        <Button
+            android:id="@+id/btn_add_food"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Add Food"
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_calculate" />
 
         <Button
             android:id="@+id/btn_calculate"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="16dp"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:gravity="center"
-            android:text="Calculate"
-            style="@style/Widget.App.Button"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
-            <TextView
-                android:id="@+id/tv_result_static"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Calories: "
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"/>
-            <TextView
-                android:id="@+id/tv_result_dynamic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"/>
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- Temporary message TextView (unused but kept in layout) -->
-    <TextView
-        android:id="@+id/tv_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="16sp"
-        android:textColor="#FFFFFF"
-        android:alpha="0"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toBottomOf="@id/input_layout"
-        app:layout_constraintBottom_toTopOf="@id/bottom_buttons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Horizontal LinearLayout for Delete and Back buttons -->
-    <LinearLayout
-        android:id="@+id/bottom_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="16dp"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+            android:text="Calculate"
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_back"
+            app:layout_constraintStart_toEndOf="@id/btn_add_food"
+            app:layout_constraintEnd_toStartOf="@id/btn_delete_food" />
 
         <Button
-            android:id="@+id/btn_delete"
+            android:id="@+id/btn_delete_food"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:gravity="center"
-            android:layout_gravity="center_vertical"
-            android:text="Delete"
-            android:enabled="false"
-            style="@style/Widget.App.Button"/>
+            android:layout_height="wrap_content"
+            android:text="Delete Food"
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_back"
+            app:layout_constraintStart_toEndOf="@id/btn_calculate"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
             android:id="@+id/btn_back"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:gravity="center"
-            android:layout_gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Back"
-            style="@style/Widget.App.Button"/>
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

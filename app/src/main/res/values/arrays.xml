@@ -1,8 +1,8 @@
 <resources>
-    <string-array name="meal_types">
+    <array name="meal_types">
         <item>Breakfast</item>
         <item>Lunch</item>
         <item>Dinner</item>
         <item>Snacks</item>
-    </string-array>
+    </array>
 </resources>

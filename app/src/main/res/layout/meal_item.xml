@@ -1,30 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#333333">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/tv_date_time"
-        android:layout_width="wrap_content"
+    <data>
+        <variable
+            name="meal"
+            type="com.example.caltracker.MealEntity" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="@color/medium_dark_gray"
+        android:layout_marginBottom="4dp">
 
-    <TextView
-        android:id="@+id/tv_meal_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="2dp">
 
-    <TextView
-        android:id="@+id/tv_calories_protein"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{meal.time}"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tv_meal_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{meal.mealType}"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{meal.description}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:paddingBottom="2dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Calories: ` + meal.calories}"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tv_protein"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Protein: ` + meal.protein}"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

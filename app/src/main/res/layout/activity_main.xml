@@ -1,186 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="2dp"
-    android:fitsSystemWindows="true"
-    android:background="#333333">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Spacer view minimized -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/transparent" />
+    <data>
+    </data>
 
-    <!-- Meal dropdown -->
-    <Spinner
-        android:id="@+id/spinner_meal_type"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="16dp"
-        android:entries="@array/meal_types"
-        android:spinnerMode="dropdown" />
+        android:background="@color/dark_gray_background"
+        tools:context=".MainActivity">
 
-    <!-- Description input -->
-    <EditText
-        android:id="@+id/et_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:padding="16dp"
-        android:hint="Description (e.g., banana)"
-        android:inputType="text"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF" />
+        <Spinner
+            android:id="@+id/spinner_meal_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/medium_dark_gray"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Input fields -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        <EditText
+            android:id="@+id/et_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:background="@null"
+            android:backgroundTint="@color/medium_gray"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/spinner_meal_type" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/medium_gray"
+            android:layout_marginTop="-4dp"
+            app:layout_constraintTop_toBottomOf="@id/et_description"
+            app:layout_constraintStart_toStartOf="@id/et_description"
+            app:layout_constraintEnd_toEndOf="@id/et_description" />
 
         <EditText
             android:id="@+id/et_calories"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:hint="Calories"
             android:inputType="number"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF" />
+            android:background="@null"
+            android:backgroundTint="@color/medium_gray"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/et_description" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/medium_gray"
+            android:layout_marginTop="-4dp"
+            app:layout_constraintTop_toBottomOf="@id/et_calories"
+            app:layout_constraintStart_toStartOf="@id/et_calories"
+            app:layout_constraintEnd_toEndOf="@id/et_calories" />
 
         <EditText
             android:id="@+id/et_protein"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Protein (g)"
-            android:inputType="number"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF" />
-
-    </LinearLayout>
-
-    <!-- Log Meal and Delete buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <Button
-            android:id="@+id/btn_save"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="2"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:text="Log Meal"
-            style="@style/Widget.App.Button"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/btn_delete"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:text="Delete"
-            android:enabled="false"
-            style="@style/Widget.App.Button" />
-
-    </LinearLayout>
-
-    <!-- Today's Meals section with title and date -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="16dp"
-            android:gravity="center_vertical">
+            android:hint="Protein"
+            android:inputType="number"
+            android:background="@null"
+            android:backgroundTint="@color/medium_gray"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/et_calories" />
 
-            <TextView
-                android:id="@+id/tv_today_meals_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="16dp"
-                android:text="Today's Meals"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF" />
-
-            <TextView
-                android:id="@+id/tv_current_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text=""
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF" />
-
-        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/medium_gray"
+            android:layout_marginTop="-4dp"
+            app:layout_constraintTop_toBottomOf="@id/et_protein"
+            app:layout_constraintStart_toStartOf="@id/et_protein"
+            app:layout_constraintEnd_toEndOf="@id/et_protein" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_today_meals"
+            android:id="@+id/rv_meals"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#333333" />
+            android:background="@color/medium_dark_gray"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/et_protein"
+            app:layout_constraintBottom_toTopOf="@id/btn_log_meal" />
 
-    </LinearLayout>
-
-    <!-- Daily Totals and Calculate buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_margin="16dp"
-        android:padding="16dp">
+        <Button
+            android:id="@+id/btn_log_meal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Log Meal"
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_daily_totals" />
 
         <Button
             android:id="@+id/btn_daily_totals"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:minHeight="48dp"
-            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Daily Totals"
-            style="@style/Widget.App.Button"
-            android:layout_marginEnd="8dp" />
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_calculator" />
 
         <Button
             android:id="@+id/btn_calculator"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:minHeight="48dp"
-            android:maxLines="1"
-            android:text="Calculate"
-            style="@style/Widget.App.Button" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calculator"
+            android:backgroundTint="@color/very_dark_gray"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    </LinearLayout>
-
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

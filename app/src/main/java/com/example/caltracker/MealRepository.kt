@@ -1,30 +1,98 @@
 package com.example.caltracker
 
-import android.app.Application
-import androidx.room.Room
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
+import androidx.room.withTransaction
+import timber.log.Timber
 
-class MealRepository(application: Application) {
-    private val database: AppDatabase = Room.databaseBuilder(
-        application,
-        AppDatabase::class.java, "caltracker-database"
-    ).build()
-    private val foodDao = database.foodDao()
-    private val mealDao = database.mealDao()
-    private val dailyTotalDao = database.dailyTotalDao()
+class MealRepository(private val appDatabase: AppDatabase) {
+
+    private val mealDao = appDatabase.mealDao()
+    private val foodDao = appDatabase.foodDao()
+    private val dailyTotalDao = appDatabase.dailyTotalDao()
 
     fun getAllFoods(): Flow<List<FoodEntity>> = foodDao.getAllFoods()
-    suspend fun getFoodByName(name: String): FoodEntity? = foodDao.getFoodByName(name)
-    suspend fun insertFood(food: FoodEntity) = foodDao.insertFood(food)
-    suspend fun deleteFood(food: FoodEntity) = foodDao.deleteFood(food)
-    fun getMealsByDate(date: String): Flow<List<MealEntity>> = mealDao.getMealsByDate(date)
-    suspend fun insertMeal(meal: MealEntity) = mealDao.insertMeal(meal)
-    suspend fun deleteMeal(meal: MealEntity) = mealDao.deleteMeal(meal)
-    fun getMealsForToday(): Flow<List<MealEntity>> {
-        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-        return mealDao.getMealsForToday(today)
+
+    suspend fun insertFood(food: FoodEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Inserting food: $food")
+        appDatabase.withTransaction {
+            foodDao.insert(food)
+        }
+        Timber.d("MealRepository: Food inserted: $food")
     }
+
+    suspend fun deleteFood(food: FoodEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Deleting food: $food")
+        appDatabase.withTransaction {
+            foodDao.delete(food)
+        }
+        Timber.d("MealRepository: Food deleted: $food")
+    }
+
+    suspend fun getFoodByName(name: String): FoodEntity? = withContext(Dispatchers.IO) {
+        val food = foodDao.getFoodByName(name)
+        Timber.d("MealRepository: Fetched food by name: $name, result: $food")
+        food
+    }
+
+    suspend fun deleteFoodByName(name: String) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Deleting food by name: $name")
+        appDatabase.withTransaction {
+            foodDao.deleteFoodByName(name)
+        }
+        Timber.d("MealRepository: Food deleted by name: $name")
+    }
+
+    fun getMealsByDate(date: String): Flow<List<MealEntity>> = mealDao.getMealsByDate(date)
+
+    fun getMealsForToday(date: String): Flow<List<MealEntity>> = mealDao.getMealsForToday(date)
+
+    suspend fun insertMeal(meal: MealEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Inserting meal: $meal")
+        appDatabase.withTransaction {
+            mealDao.insert(meal)
+        }
+        Timber.d("MealRepository: Meal inserted: $meal")
+    }
+
+    suspend fun deleteMeal(meal: MealEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Deleting meal: $meal")
+        appDatabase.withTransaction {
+            mealDao.delete(meal)
+        }
+        Timber.d("MealRepository: Meal deleted: $meal")
+    }
+
     fun getAllDailyTotals(): Flow<List<DailyTotalEntity>> = dailyTotalDao.getAllDailyTotals()
-    suspend fun insertDailyTotal(dailyTotal: DailyTotalEntity) = dailyTotalDao.insertDailyTotal(dailyTotal)
-    suspend fun deleteDailyTotal(dailyTotal: DailyTotalEntity) = dailyTotalDao.deleteDailyTotal(dailyTotal)
+
+    suspend fun insertDailyTotal(dailyTotal: DailyTotalEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Inserting daily total: $dailyTotal")
+        appDatabase.withTransaction {
+            dailyTotalDao.insert(dailyTotal)
+        }
+        Timber.d("MealRepository: Daily total inserted: $dailyTotal")
+    }
+
+    suspend fun updateDailyTotal(dailyTotal: DailyTotalEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Updating daily total: $dailyTotal")
+        appDatabase.withTransaction {
+            dailyTotalDao.update(dailyTotal)
+        }
+        Timber.d("MealRepository: Daily total updated: $dailyTotal")
+    }
+
+    suspend fun deleteDailyTotal(dailyTotal: DailyTotalEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Deleting daily total: $dailyTotal")
+        appDatabase.withTransaction {
+            dailyTotalDao.delete(dailyTotal)
+        }
+        Timber.d("MealRepository: Daily total deleted: $dailyTotal")
+    }
+
+    suspend fun getDailyTotalByDate(date: String): DailyTotalEntity? = withContext(Dispatchers.IO) {
+        val dailyTotal = dailyTotalDao.getDailyTotalByDate(date)
+        Timber.d("MealRepository: Fetched daily total for date: $date, result: $dailyTotal")
+        dailyTotal
+    }
 }
