@@ -2,6 +2,7 @@ package com.example.caltracker
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import androidx.room.withTransaction
 import timber.log.Timber
@@ -51,13 +52,24 @@ class MealRepository(private val appDatabase: AppDatabase) {
 
     fun getMealsForToday(date: String): Flow<List<MealEntity>> = mealDao.getMealsForToday(date)
 
-    suspend fun insertMeal(meal: MealEntity) = withContext(Dispatchers.IO) {
-        Timber.d("MealRepository: Inserting meal: $meal")
+    suspend fun insertMealAndUpdateTotals(meal: MealEntity) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Inserting meal and updating totals: $meal")
         appDatabase.withTransaction {
             mealDao.insert(meal)
             Timber.d("MealRepository: Meal inserted inside transaction: $meal")
+            val meals = mealDao.getMealsByDate(meal.date).first()
+            val totalCalories = meals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
+            val totalProtein = meals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
+            val existingDailyTotal = dailyTotalDao.getDailyTotalByDate(meal.date)
+            if (existingDailyTotal == null) {
+                dailyTotalDao.insert(DailyTotalEntity(date = meal.date, totalCalories = totalCalories, totalProtein = totalProtein))
+                Timber.d("MealRepository: Inserted new daily total for ${meal.date}: Calories=$totalCalories, Protein=$totalProtein")
+            } else {
+                dailyTotalDao.update(DailyTotalEntity(id = existingDailyTotal.id, date = meal.date, totalCalories = totalCalories, totalProtein = totalProtein))
+                Timber.d("MealRepository: Updated daily total for ${meal.date}: Calories=$totalCalories, Protein=$totalProtein")
+            }
         }
-        Timber.d("MealRepository: Meal insert completed: $meal")
+        Timber.d("MealRepository: Meal insert and totals update completed: $meal")
     }
 
     suspend fun deleteMeal(meal: MealEntity) = withContext(Dispatchers.IO) {
@@ -65,6 +77,17 @@ class MealRepository(private val appDatabase: AppDatabase) {
         appDatabase.withTransaction {
             mealDao.delete(meal)
             Timber.d("MealRepository: Meal deleted inside transaction: $meal")
+            val meals = mealDao.getMealsByDate(meal.date).first()
+            val totalCalories = meals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
+            val totalProtein = meals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
+            val existingDailyTotal = dailyTotalDao.getDailyTotalByDate(meal.date)
+            if (meals.isEmpty() && existingDailyTotal != null) {
+                dailyTotalDao.delete(existingDailyTotal)
+                Timber.d("MealRepository: Deleted daily total for ${meal.date}")
+            } else if (existingDailyTotal != null) {
+                dailyTotalDao.update(DailyTotalEntity(id = existingDailyTotal.id, date = meal.date, totalCalories = totalCalories, totalProtein = totalProtein))
+                Timber.d("MealRepository: Updated daily total for ${meal.date}: Calories=$totalCalories, Protein=$totalProtein")
+            }
         }
         Timber.d("MealRepository: Meal delete completed: $meal")
     }

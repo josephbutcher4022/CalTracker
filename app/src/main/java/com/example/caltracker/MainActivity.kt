@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         repository = MealRepository(AppDatabase.getDatabase(this))
         Timber.d("MainActivity: Repository initialized")
 
-        viewModel = ViewModelProvider(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(this, MainViewModelFactory(application)).get(MainViewModel::class.java)
         Timber.d("MainActivity: ViewModel initialized")
         adapter = MealAdapter()
         Timber.d("MainActivity: Adapter created")
@@ -55,21 +56,14 @@ class MainActivity : AppCompatActivity() {
                 val position = viewHolder.adapterPosition
                 val meal = adapter.currentList[position]
                 lifecycleScope.launch {
-                    viewModel.deleteMeal(meal)
-                    Timber.d("MainActivity: Meal deleted: $meal")
-                    // Update daily totals after deletion
-                    val date = meal.date
-                    val meals = repository.getMealsByDate(date).first()
-                    val totalCalories = meals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
-                    val totalProtein = meals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
-                    val existingDailyTotal = repository.getDailyTotalByDate(date)
-                    if (meals.isEmpty() && existingDailyTotal != null) {
-                        repository.deleteDailyTotal(existingDailyTotal)
-                    } else if (existingDailyTotal != null) {
-                        repository.updateDailyTotal(DailyTotalEntity(id = existingDailyTotal.id, date = date, totalCalories = totalCalories, totalProtein = totalProtein))
+                    try {
+                        viewModel.deleteMeal(meal)
+                        Timber.d("MainActivity: Meal deleted: $meal")
+                        adapter.notifyDataSetChanged() // Force adapter refresh
+                    } catch (e: Exception) {
+                        Timber.e(e, "MainActivity: Failed to delete meal: $meal")
+                        Toast.makeText(this@MainActivity, "Error deleting meal: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-                    Timber.d("MainActivity: Daily totals updated after deletion for $date: Calories=$totalCalories, Protein=$totalProtein")
-                    adapter.notifyDataSetChanged() // Force adapter refresh
                 }
             }
         }
@@ -110,13 +104,16 @@ class MainActivity : AppCompatActivity() {
             // Prevent logging if all input fields are empty
             if (description.isEmpty() && calories == 0 && protein == 0) {
                 Timber.d("MainActivity: Log meal skipped - all input fields are empty")
+                Toast.makeText(this, "Please enter at least one field (description, calories, or protein)", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(java.util.Date())
+            // Get current date for the meal
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val currentDate = dateFormat.format(java.util.Date())
             val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(java.util.Date())
             val meal = MealEntity(
-                date = date,
+                date = currentDate,
                 time = time,
                 mealType = mealType,
                 description = description,
@@ -132,19 +129,24 @@ class MainActivity : AppCompatActivity() {
                     binding.etDescription.text.clear()
                     binding.etCalories.text.clear()
                     binding.etProtein.text.clear()
+                    adapter.notifyDataSetChanged() // Force adapter refresh
 
-                    // Update daily totals after logging a meal
-                    val meals = repository.getMealsByDate(date).first()
-                    val totalCalories = meals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
-                    val totalProtein = meals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
-                    val existingDailyTotal = repository.getDailyTotalByDate(date)
-                    if (existingDailyTotal == null) {
-                        repository.insertDailyTotal(DailyTotalEntity(date = date, totalCalories = totalCalories, totalProtein = totalProtein))
-                    } else {
-                        repository.updateDailyTotal(DailyTotalEntity(id = existingDailyTotal.id, date = date, totalCalories = totalCalories, totalProtein = totalProtein))
+                    // Reset totals at 11:59 PM
+                    val calendar = Calendar.getInstance()
+                    val currentTime = calendar.timeInMillis
+                    calendar.set(Calendar.HOUR_OF_DAY, 23)
+                    calendar.set(Calendar.MINUTE, 59)
+                    calendar.set(Calendar.SECOND, 59)
+                    calendar.set(Calendar.MILLISECOND, 999)
+                    val endOfDay = calendar.timeInMillis
+                    if (currentTime > endOfDay) {
+                        // New day started, reset totals for the new day
+                        val newDate = dateFormat.format(java.util.Date())
+                        if (newDate != currentDate) {
+                            repository.deleteDailyTotal(DailyTotalEntity(date = currentDate, totalCalories = 0, totalProtein = 0))
+                            Timber.d("MainActivity: Reset daily total for new day: $newDate")
+                        }
                     }
-                    Timber.d("MainActivity: Daily totals updated for $date: Calories=$totalCalories, Protein=$totalProtein")
-                    adapter.notifyDataSetChanged() // Force adapter refresh after insert
                 } catch (e: Exception) {
                     Timber.e(e, "MainActivity: Failed to log meal or update totals: $meal")
                     Toast.makeText(this@MainActivity, "Error saving meal: ${e.message}", Toast.LENGTH_SHORT).show()

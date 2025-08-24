@@ -1,14 +1,14 @@
 package com.example.caltracker
 
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class MainViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            val repository = MealRepository(AppDatabase.getDatabase(context))
-            return MainViewModel(repository) as T
+            @Suppress("UNCHECKED_CAST")
+            return MainViewModel(application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

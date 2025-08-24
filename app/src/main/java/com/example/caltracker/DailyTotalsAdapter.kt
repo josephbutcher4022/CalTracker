@@ -7,25 +7,28 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caltracker.databinding.DailyTotalItemBinding
 
-class DailyTotalsAdapter(private val onClick: (DailyTotalEntity) -> Unit = {}) : ListAdapter<DailyTotalEntity, DailyTotalsAdapter.DailyTotalViewHolder>(DailyTotalDiffCallback()) {
+class DailyTotalsAdapter(
+    private val onClick: (DailyTotalEntity) -> Unit = {}
+) : ListAdapter<DailyTotalEntity, DailyTotalsAdapter.DailyTotalViewHolder>(DailyTotalDiffCallback()) {
+
+    class DailyTotalViewHolder(
+        private val binding: DailyTotalItemBinding,
+        private val onClick: (DailyTotalEntity) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(dailyTotal: DailyTotalEntity) {
+            binding.dailyTotal = dailyTotal
+            binding.executePendingBindings() // Ensure data binding updates
+            binding.root.setOnClickListener { onClick(dailyTotal) }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyTotalViewHolder {
         val binding = DailyTotalItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DailyTotalViewHolder(binding)
+        return DailyTotalViewHolder(binding, onClick)
     }
 
     override fun onBindViewHolder(holder: DailyTotalViewHolder, position: Int) {
-        val dailyTotal = getItem(position)
-        holder.bind(dailyTotal)
-        holder.itemView.setOnClickListener { onClick(dailyTotal) }
-    }
-
-    class DailyTotalViewHolder(private val binding: DailyTotalItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(dailyTotal: DailyTotalEntity) {
-            binding.tvDate.text = dailyTotal.date
-            binding.tvTotalCalories.text = dailyTotal.totalCalories.toString()
-            binding.tvTotalProtein.text = dailyTotal.totalProtein.toString()
-        }
+        holder.bind(getItem(position))
     }
 
     class DailyTotalDiffCallback : DiffUtil.ItemCallback<DailyTotalEntity>() {

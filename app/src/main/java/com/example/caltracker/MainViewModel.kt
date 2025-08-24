@@ -1,32 +1,34 @@
 package com.example.caltracker
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class MainViewModel(private val repository: MealRepository) : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = MealRepository(AppDatabase.getDatabase(application))
 
     fun insertMeal(meal: MealEntity) {
         viewModelScope.launch {
-            repository.insertMeal(meal)
+            try {
+                repository.insertMealAndUpdateTotals(meal)
+                Timber.d("MainViewModel: Meal inserted: $meal")
+            } catch (e: Exception) {
+                Timber.e(e, "MainViewModel: Failed to insert meal: $meal")
+            }
         }
     }
 
     fun deleteMeal(meal: MealEntity) {
         viewModelScope.launch {
-            repository.deleteMeal(meal)
-        }
-    }
-
-    fun insertDailyTotal(dailyTotal: DailyTotalEntity) {
-        viewModelScope.launch {
-            repository.insertDailyTotal(dailyTotal)
-        }
-    }
-
-    fun deleteDailyTotal(dailyTotal: DailyTotalEntity) {
-        viewModelScope.launch {
-            repository.deleteDailyTotal(dailyTotal)
+            try {
+                repository.deleteMeal(meal)
+                Timber.d("MainViewModel: Meal deleted: $meal")
+            } catch (e: Exception) {
+                Timber.e(e, "MainViewModel: Failed to delete meal: $meal")
+            }
         }
     }
 }
