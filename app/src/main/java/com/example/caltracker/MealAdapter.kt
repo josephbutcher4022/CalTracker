@@ -9,24 +9,20 @@ import com.example.caltracker.databinding.MealItemBinding
 
 class MealAdapter : ListAdapter<MealEntity, MealAdapter.MealViewHolder>(MealDiffCallback()) {
 
+    class MealViewHolder(private val binding: MealItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(meal: MealEntity) {
+            binding.meal = meal
+            binding.executePendingBindings() // Force binding update
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealViewHolder {
         val binding = MealItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MealViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MealViewHolder, position: Int) {
-        val meal = getItem(position)
-        holder.bind(meal)
-    }
-
-    class MealViewHolder(private val binding: MealItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(meal: MealEntity) {
-            binding.tvMealType.text = meal.mealType
-            binding.tvDescription.text = meal.description
-            binding.tvCalories.text = meal.calories.toString()
-            binding.tvProtein.text = meal.protein.toString()
-            binding.tvTime.text = meal.time
-        }
+        holder.bind(getItem(position))
     }
 
     class MealDiffCallback : DiffUtil.ItemCallback<MealEntity>() {

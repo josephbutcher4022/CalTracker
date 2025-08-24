@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [MealEntity::class, FoodEntity::class, DailyTotalEntity::class], version = 8, exportSchema = false)
+@Database(entities = [MealEntity::class, FoodEntity::class, DailyTotalEntity::class], version = 10, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun mealDao(): MealDao
     abstract fun foodDao(): FoodDao
@@ -17,13 +17,25 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        private val MIGRATION_1_8 = object : Migration(1, 8) {
+        private val MIGRATION_1_10 = object : Migration(1, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Empty migration - no schema changes
             }
         }
 
-        private val MIGRATION_7_8 = object : Migration(7, 8) {
+        private val MIGRATION_7_10 = object : Migration(7, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Empty migration - no schema changes
+            }
+        }
+
+        private val MIGRATION_8_10 = object : Migration(8, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Empty migration - no schema changes
+            }
+        }
+
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Empty migration - no schema changes
             }
@@ -36,7 +48,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "caltracker_database"
                 )
-                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8)
+                    .addMigrations(MIGRATION_1_10, MIGRATION_7_10, MIGRATION_8_10, MIGRATION_9_10)
                     .build()
                 INSTANCE = instance
                 instance

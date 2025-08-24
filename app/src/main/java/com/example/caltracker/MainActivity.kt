@@ -3,6 +3,7 @@ package com.example.caltracker
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
                         repository.updateDailyTotal(DailyTotalEntity(id = existingDailyTotal.id, date = date, totalCalories = totalCalories, totalProtein = totalProtein))
                     }
                     Timber.d("MainActivity: Daily totals updated after deletion for $date: Calories=$totalCalories, Protein=$totalProtein")
+                    adapter.notifyDataSetChanged() // Force adapter refresh
                 }
             }
         }
@@ -95,9 +97,15 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogMeal.setOnClickListener {
             Timber.d("MainActivity: Log meal button clicked")
             val mealType = binding.spinnerMealType.selectedItem?.toString() ?: "Unknown"
+            Timber.d("MainActivity: Meal type: $mealType")
             val description = binding.etDescription.text.toString().trim()
-            val calories = binding.etCalories.text.toString().toIntOrNull() ?: 0
-            val protein = binding.etProtein.text.toString().toIntOrNull() ?: 0
+            Timber.d("MainActivity: Description: $description")
+            val caloriesStr = binding.etCalories.text.toString().trim()
+            Timber.d("MainActivity: Calories string: $caloriesStr")
+            val proteinStr = binding.etProtein.text.toString().trim()
+            Timber.d("MainActivity: Protein string: $proteinStr")
+            val calories = caloriesStr.toIntOrNull() ?: 0
+            val protein = proteinStr.toIntOrNull() ?: 0
 
             // Prevent logging if all input fields are empty
             if (description.isEmpty() && calories == 0 && protein == 0) {
@@ -116,24 +124,31 @@ class MainActivity : AppCompatActivity() {
                 protein = protein
             )
             lifecycleScope.launch {
-                viewModel.insertMeal(meal)
-                Timber.d("MainActivity: Meal logged: $meal")
-                // Clear input fields after logging
-                binding.etDescription.text.clear()
-                binding.etCalories.text.clear()
-                binding.etProtein.text.clear()
+                try {
+                    Timber.d("MainActivity: Attempting to log meal: $meal")
+                    viewModel.insertMeal(meal)
+                    Timber.d("MainActivity: Meal logged successfully: $meal")
+                    // Clear input fields after logging
+                    binding.etDescription.text.clear()
+                    binding.etCalories.text.clear()
+                    binding.etProtein.text.clear()
 
-                // Update daily totals after logging a meal
-                val meals = repository.getMealsByDate(date).first()
-                val totalCalories = meals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
-                val totalProtein = meals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
-                val existingDailyTotal = repository.getDailyTotalByDate(date)
-                if (existingDailyTotal == null) {
-                    repository.insertDailyTotal(DailyTotalEntity(date = date, totalCalories = totalCalories, totalProtein = totalProtein))
-                } else {
-                    repository.updateDailyTotal(DailyTotalEntity(id = existingDailyTotal.id, date = date, totalCalories = totalCalories, totalProtein = totalProtein))
+                    // Update daily totals after logging a meal
+                    val meals = repository.getMealsByDate(date).first()
+                    val totalCalories = meals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
+                    val totalProtein = meals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
+                    val existingDailyTotal = repository.getDailyTotalByDate(date)
+                    if (existingDailyTotal == null) {
+                        repository.insertDailyTotal(DailyTotalEntity(date = date, totalCalories = totalCalories, totalProtein = totalProtein))
+                    } else {
+                        repository.updateDailyTotal(DailyTotalEntity(id = existingDailyTotal.id, date = date, totalCalories = totalCalories, totalProtein = totalProtein))
+                    }
+                    Timber.d("MainActivity: Daily totals updated for $date: Calories=$totalCalories, Protein=$totalProtein")
+                    adapter.notifyDataSetChanged() // Force adapter refresh after insert
+                } catch (e: Exception) {
+                    Timber.e(e, "MainActivity: Failed to log meal or update totals: $meal")
+                    Toast.makeText(this@MainActivity, "Error saving meal: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
-                Timber.d("MainActivity: Daily totals updated for $date: Calories=$totalCalories, Protein=$totalProtein")
             }
         }
 
