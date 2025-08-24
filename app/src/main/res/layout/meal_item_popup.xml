@@ -6,6 +6,9 @@
         <variable
             name="meal"
             type="com.example.caltracker.MealEntity" />
+        <variable
+            name="isSelected"
+            type="boolean" />
     </data>
 
     <LinearLayout
@@ -13,7 +16,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="8dp"
-        android:background="@color/medium_dark_gray"
+        android:background="@{isSelected ? @color/light_gray : @color/medium_dark_gray}"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_marginBottom="4dp">
 
         <LinearLayout

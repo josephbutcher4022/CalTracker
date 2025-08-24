@@ -6,13 +6,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caltracker.databinding.MealItemBinding
+import timber.log.Timber
 
 class MealAdapter : ListAdapter<MealEntity, MealAdapter.MealViewHolder>(MealDiffCallback()) {
 
-    class MealViewHolder(private val binding: MealItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MealViewHolder(
+        private val binding: MealItemBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(meal: MealEntity) {
             binding.meal = meal
-            binding.executePendingBindings() // Force binding update
+            binding.executePendingBindings()
+            Timber.d("MealAdapter: Bound meal: $meal")
         }
     }
 

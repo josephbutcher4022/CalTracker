@@ -92,6 +92,44 @@ class MealRepository(private val appDatabase: AppDatabase) {
         Timber.d("MealRepository: Meal delete completed: $meal")
     }
 
+    suspend fun moveMeal(meal: MealEntity, newDate: String) = withContext(Dispatchers.IO) {
+        Timber.d("MealRepository: Moving meal: $meal to new date: $newDate")
+        appDatabase.withTransaction {
+            val oldDate = meal.date
+            val updatedMeal = meal.copy(date = newDate)
+            mealDao.delete(meal)
+            mealDao.insert(updatedMeal)
+            Timber.d("MealRepository: Meal moved inside transaction: $updatedMeal")
+
+            // Update totals for old date
+            val oldMeals = mealDao.getMealsByDate(oldDate).first()
+            val oldTotalCalories = oldMeals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
+            val oldTotalProtein = oldMeals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
+            val oldExistingDailyTotal = dailyTotalDao.getDailyTotalByDate(oldDate)
+            if (oldMeals.isEmpty() && oldExistingDailyTotal != null) {
+                dailyTotalDao.delete(oldExistingDailyTotal)
+                Timber.d("MealRepository: Deleted daily total for old date $oldDate")
+            } else if (oldExistingDailyTotal != null) {
+                dailyTotalDao.update(DailyTotalEntity(id = oldExistingDailyTotal.id, date = oldDate, totalCalories = oldTotalCalories, totalProtein = oldTotalProtein))
+                Timber.d("MealRepository: Updated daily total for old date $oldDate: Calories=$oldTotalCalories, Protein=$oldTotalProtein")
+            }
+
+            // Update totals for new date
+            val newMeals = mealDao.getMealsByDate(newDate).first()
+            val newTotalCalories = newMeals.sumOf { m: MealEntity -> m.calories.toLong() }.toInt()
+            val newTotalProtein = newMeals.sumOf { m: MealEntity -> m.protein.toLong() }.toInt()
+            val newExistingDailyTotal = dailyTotalDao.getDailyTotalByDate(newDate)
+            if (newExistingDailyTotal == null) {
+                dailyTotalDao.insert(DailyTotalEntity(date = newDate, totalCalories = newTotalCalories, totalProtein = newTotalProtein))
+                Timber.d("MealRepository: Inserted new daily total for new date $newDate: Calories=$newTotalCalories, Protein=$newTotalProtein")
+            } else {
+                dailyTotalDao.update(DailyTotalEntity(id = newExistingDailyTotal.id, date = newDate, totalCalories = newTotalCalories, totalProtein = newTotalProtein))
+                Timber.d("MealRepository: Updated daily total for new date $newDate: Calories=$newTotalCalories, Protein=$newTotalProtein")
+            }
+        }
+        Timber.d("MealRepository: Meal move completed: $meal to $newDate")
+    }
+
     fun getAllDailyTotals(): Flow<List<DailyTotalEntity>> = dailyTotalDao.getAllDailyTotals()
 
     suspend fun insertDailyTotal(dailyTotal: DailyTotalEntity) = withContext(Dispatchers.IO) {
